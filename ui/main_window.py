@@ -4,12 +4,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QTimer, Qt
 from PyQt5.QtGui import QImage, QPixmap
 import numpy as np
+from audio.sounds import Sounds
 
 from vision.camera import Camera
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        # self.sound = Sound() need to figure out a sound 
+        self.face_present = False
 
         self.setWindowTitle("Say Cheese?")
         self.setGeometry(100, 100, 900, 600)
@@ -63,12 +66,16 @@ class MainWindow(QMainWindow):
 
         # frame, face_detected = result
 
-        if face_detected:
+        if face_detected and not self.face_present:
             self.status_label.setText("👁 Face detected — analyzing...")
             self.status_label.setStyleSheet("color: #00ff99;")
-        else:
+            self.sound.fade_in()
+            self.face_present = True
+        elif not face_detected and self.face_present:
             self.status_label.setText("🔍 Scanning for presence...")
             self.status_label.setStyleSheet("color: #ffffff;")
+            self.sound.fade_out()
+            self.face_present = False
 
         height, width, channels = frame.shape
         bytes_per_line = channels * width
@@ -94,3 +101,5 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event):
         self.camera.release()
         event.accept()
+
+    
