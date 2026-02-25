@@ -1,55 +1,37 @@
-# SAY CHEESE! 📸
+# SAY CHEESE! 🕹️
 
-A gesture-controlled desktop camera experience built with Python, PyQt5, and OpenCV. Interact with a live camera feed using hand movements and facial expressions — capture photos, switch visual effects, and watch every interaction logged in real time.
+### >>> ARCADE MODE <<<
+
+A gesture-controlled desktop camera experience built with Python, PyQt5, and OpenCV. Interact with a live camera feed using hand movements and facial expressions — capture photos, switch visual effects, apply photo booth frames, and watch your activity on a live retro dashboard.
 
 ## Features
 
-- **Live Camera Feed** with HUD-style overlays (face brackets, scan lines, crosshairs)
-- **6 Visual Effects**: None, Noir, Thermal, Glitch, Pixel, Vaporwave
-- **Photo Capture** with countdown timer and flash animation
+- **Live Camera Feed** with pixel-art HUD overlays (chunky neon brackets, arcade borders, retro scanlines)
+- **8 Visual Effects**: None, Noir, Thermal, Glitch, Pixel, Vaporwave, CRT, Neon Edge
+- **6 Photo Booth Frames**: Hearts, Stars, Arcade, Glitch, Rainbow (animated!)
+- **Photo Capture** with big neon countdown and flash
+- **Score System** — earn points for interactions, build combos with quick actions
+- **Live Dashboard** with real-time graphs (face detection, motion activity, events/sec)
+- **Color-coded Event Log** tracking every interaction
+- **Photo Gallery** tab with capture thumbnails
 - **Motion Detection** with zone-based tracking
 - **Face Detection** with stability analysis
 - **Event Logging** — every interaction saved to SQLite
-- **Live Stats** sidebar with event log and capture gallery
-- **Keyboard Shortcuts**: `Space` capture, `1-6` effects, `Esc` quit
 
 ## Setup
 
 ```bash
-# Clone and enter the project
 cd say-cheese
 
-# Create virtual environment
 python -m venv .venv
 source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 
-# Install dependencies
 pip install -r requirements.txt
 
-# Run
+# Delete old database if upgrading
+# del data\events.db
+
 python main.py
-```
-
-## Project Structure
-
-```
-say_cheese/
-├── main.py              # Entry point
-├── config.py            # All settings & constants
-├── requirements.txt
-├── vision/
-│   ├── camera.py        # Camera capture + pipeline
-│   ├── face.py          # Haar cascade face detection
-│   ├── hands.py         # Motion-based tracking
-│   └── effects.py       # Visual effects (noir, thermal, etc.)
-├── ui/
-│   ├── main_window.py   # Main application window
-│   └── overlays.py      # HUD overlay renderer
-├── data/
-│   └── database.py      # SQLite event logger
-├── audio/               # Sound effects (future)
-├── assets/              # Images, sounds
-└── captures/            # Saved photos
 ```
 
 ## Keyboard Shortcuts
@@ -57,23 +39,41 @@ say_cheese/
 | Key | Action |
 |-----|--------|
 | `Space` | Start capture countdown |
-| `1` | No effect |
-| `2` | Noir |
-| `3` | Thermal |
-| `4` | Glitch |
-| `5` | Pixel |
-| `6` | Vaporwave |
+| `1-8` | Switch visual effects |
+| `Q-Y` | Switch photo booth frames |
 | `Esc` | Quit |
+
+## Project Structure
+
+```
+say_cheese/
+├── main.py              # Entry point
+├── config.py            # Settings, colors, effects, frames
+├── requirements.txt
+├── vision/
+│   ├── camera.py        # Camera capture pipeline
+│   ├── face.py          # Haar cascade face detection
+│   ├── hands.py         # Motion-based tracking
+│   └── effects.py       # Visual effects (8 total)
+├── ui/
+│   ├── main_window.py   # Main app window + dashboard + gallery
+│   └── overlays.py      # Retro HUD + photo booth frames
+├── data/
+│   └── database.py      # SQLite event logger
+├── audio/               # Sound effects (future)
+├── assets/              # Images, sounds
+└── captures/            # Saved photos
+```
 
 ## Next Steps
 
 - [ ] MediaPipe integration for real hand gesture recognition
 - [ ] Specific gestures: peace sign → capture, thumbs up → effect cycle
-- [ ] Sound effects (shutter click, mode switch)
-- [ ] Photo gallery browser view
-- [ ] Gesture-based UI navigation (wave to scroll effects)
-- [ ] Export photos with metadata
+- [ ] Sound effects (8-bit shutter click, coin sounds for scoring)
+- [ ] Gesture-based UI navigation
+- [ ] Leaderboard / high score persistence
+- [ ] Export photos with metadata and frames baked in
 
 ---
 
-*Exploring the intersection of human-computer interaction, creative coding, and machine perception.*
+*Exploring the intersection of human-computer interaction, creative coding, and machine perception — now with extra pixels.*

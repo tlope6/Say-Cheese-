@@ -7,8 +7,8 @@ from ui.main_window import MainWindow
 
 def main():
     # High DPI support
-    # QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
-    # QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
     app = QApplication(sys.argv)
     app.setApplicationName("Say Cheese!")
