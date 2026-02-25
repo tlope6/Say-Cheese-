@@ -1,50 +1,67 @@
+"""
+Camera capture and vision pipeline.
+Coordinates face detection, motion tracking, and frame processing.
+"""
+
 import cv2
-import os
+from vision.face import FaceDetector
+from vision.hands import MotionTracker
+from config import CAMERA_INDEX, FRAME_WIDTH, FRAME_HEIGHT
 
-class Camera :
-    def __init__(self, camera_index = 0) :
+
+class Camera:
+    def __init__(self, camera_index=CAMERA_INDEX):
         self.cap = cv2.VideoCapture(camera_index)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
 
-        #loading haar cascade for face detection
-        # self.face_cascade = cv2.CascadeClassifier(
-        #     cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
-        # )
-        cascade_path = os.path.join (
-            os.path.dirname(cv2.__file__), 
-            "data", 
-            "haarcascade_frontalface_default.xml"
-        )
+        self.face_detector = FaceDetector()
+        self.motion_tracker = MotionTracker()
 
-        self.face_cascade = cv2.CascadeClassifier(cascade_path)
-
-        self.scan_offset = 0 #for scanning line animation
+        self.scan_offset = 0
+        self.frame_count = 0
 
     def get_frame(self):
+        """
+        Capture and process one frame.
+        Returns: (frame_rgb, face_data, motion_data) or (None, None, None)
+        """
         ret, frame = self.cap.read()
         if not ret:
-            return None, False
+            return None, None, None
 
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        self.frame_count += 1
 
-        faces = self.face_cascade.detectMultiScale(
-            gray,
-            scaleFactor=1.2,
-            minNeighbors=5,
-            minSize=(80, 80)
-        )
+        # Mirror the frame for natural interaction
+        frame = cv2.flip(frame, 1)
 
-        for (x, y, w, h) in faces:
-            cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        # ─── Face Detection ───────────────────────────
+        faces = self.face_detector.detect(frame)
+        face_data = self.face_detector.analyze(faces)
 
-            scan_y = y + (self.scan_offset % h)
-            cv2.line(frame, (x, scan_y), (x + w, scan_y), (0, 255, 0), 1)
+        # ─── Motion Detection ─────────────────────────
+        h, w = frame.shape[:2]
+        has_motion, regions = self.motion_tracker.detect(frame)
+        gesture_zone = self.motion_tracker.get_gesture_zone(w, h)
 
-        self.scan_offset += 5
+        motion_data = {
+            "detected": has_motion,
+            "regions": regions,
+            "zone": gesture_zone,
+        }
 
-        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # ─── Convert to RGB for Qt ────────────────────
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
-        return frame, len(faces) > 0
+        return frame_rgb, face_data, motion_data
 
-    
-    def release(self) :
+    def capture_raw(self):
+        """Capture a clean frame without any overlays (for saving photos)."""
+        ret, frame = self.cap.read()
+        if not ret:
+            return None
+        frame = cv2.flip(frame, 1)
+        return cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    def release(self):
         self.cap.release()
